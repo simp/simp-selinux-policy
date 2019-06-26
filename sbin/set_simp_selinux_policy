@@ -1,0 +1,41 @@
+#!/bin/sh
+
+export PATH="/sbin:/usr/sbin:/bin:/usr/bin"
+
+declare -a simp_dirs=("/var/simp")
+
+arg=$1
+
+semodule_path=`which semodule 2>/dev/null`
+
+if [ $? -eq 0 ]; then
+  if [ "${arg}" == 'install' ]; then
+    # Build and load policy to set selinux context to enable puppet to read from
+    # SIMP-related directories.
+
+    $semodule_path -n -i /usr/share/selinux/packages/simp
+
+    if selinuxenabled; then
+      load_policy
+
+      for dir in "${simp_dirs[@]}"; do
+        restorecon -F -R -i "${dir}"
+      done
+    fi
+  elif [ "${arg}" == 'remove' ]; then
+    # Unload the simp policy and relabel the filesystem
+
+    /usr/sbin/semodule -n -r %{selinux_policy_short}
+
+    if selinuxenabled; then
+      load_policy
+
+      for dir in "${simp_dirs[@]}"; do
+        restorecon -R -i "${dir}"
+      done
+    fi
+  else
+    echo "Usage: ${0} [install|remove]"
+    exit 1
+  fi
+fi
