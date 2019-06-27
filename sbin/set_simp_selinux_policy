@@ -14,7 +14,7 @@ if [ $? -eq 0 ]; then
     # Build and load policy to set selinux context to enable puppet to read from
     # SIMP-related directories.
 
-    $semodule_path -n -i /usr/share/selinux/packages/simp
+    $semodule_path -n -i /usr/share/selinux/packages/simp.pp
 
     if selinuxenabled; then
 
@@ -35,7 +35,7 @@ if [ $? -eq 0 ]; then
   elif [ "${arg}" == 'remove' ]; then
     # Unload the simp policy and relabel the filesystem
 
-    $semodule_path -n -r %{selinux_policy_short}
+    $semodule_path -n -r simp
 
     if selinuxenabled; then
       load_policy
