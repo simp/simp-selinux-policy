@@ -30,13 +30,12 @@
 
 %define selinux_policy_short simp
 %define selinux_policy %{selinux_policy_short}.pp
-%define old_selinux_policy simp-environment
 
 
 Summary: SIMP SELinux Policies
 Name: simp-selinux-policy
 Version: 1.0.0
-Release: 0
+Release: 0%{?dist}
 License: Apache License 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
@@ -107,7 +106,7 @@ cd -
 %attr(0750,-,-) %{_datadir}/simp/sbin/set_simp_selinux_policy
 
 %post
-/usr/share/simp/sbin/set_simp_selinux_policy install
+%{_datadir}/simp/sbin/set_simp_selinux_policy install
 
 %postun
 if [ $1 -eq 0 ]; then
@@ -116,4 +115,5 @@ fi
 
 %changelog
 * Tue Apr 30 2019 Trevor Vaughan <tvaughan@onyxpoint.com> - 1.0.0-0
-- Creation of a new simp-selinux-policy package
+- Creation of a new simp-selinux-policy package.  Policies were
+  originally packaged in the simp-environment package.

@@ -1,8 +1,5 @@
-# simp-environment-skeleton
+# simp-selinux-policy
 
-This repositority contains items that [SIMP](https://simp-project.com) expects
-to be in every [Puppet](https://puppet.com) environment.
+This repositority builds and packages SELinux policies suitable for
+configuring permissions on SIMP provided server components.
 
-It is a great starting place for creating Puppet Control Repos and is the
-default environment that is used when running a regular
-[SIMP](https://simp-project.com) system.
