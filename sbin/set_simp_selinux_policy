@@ -2,7 +2,8 @@
 
 export PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 
-declare -a simp_dirs=("/var/simp")
+declare -a simp_dirs=('/var/simp')
+declare -a old_policies=('simp-environment')
 
 arg=$1
 
@@ -16,6 +17,15 @@ if [ $? -eq 0 ]; then
     $semodule_path -n -i /usr/share/selinux/packages/simp
 
     if selinuxenabled; then
+
+      for policy in "${old_policies[@]}"; do
+        $semodule_path --list | grep -q "${policy}"
+
+        if [ $? -eq 0 ]; then
+          $semodule_path -r "${policy}"
+        fi
+      done
+
       load_policy
 
       for dir in "${simp_dirs[@]}"; do
@@ -25,7 +35,7 @@ if [ $? -eq 0 ]; then
   elif [ "${arg}" == 'remove' ]; then
     # Unload the simp policy and relabel the filesystem
 
-    /usr/sbin/semodule -n -r %{selinux_policy_short}
+    $semodule_path -n -r %{selinux_policy_short}
 
     if selinuxenabled; then
       load_policy
