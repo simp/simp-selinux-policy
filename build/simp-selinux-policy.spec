@@ -30,6 +30,8 @@
 
 %define selinux_policy_short simp
 %define selinux_policy %{selinux_policy_short}.pp
+%define old_selinux_policy simp-environment
+
 
 Summary: SIMP SELinux Policies
 Name: simp-selinux-policy
@@ -105,6 +107,13 @@ cd -
 %attr(0750,-,-) %{_datadir}/simp/sbin/set_simp_selinux_policy
 
 %post
+# There are conflicts between the old and new policy. Remove the old one
+# before loading the new one.
+/usr/sbin/semodule --list | grep "^%{old_selinux_policy}\s"
+if [ $? -eq 0 ]; then
+  /usr/sbin/semodule -r %{old_selinux_policy}
+fi
+
 /usr/share/simp/sbin/set_simp_selinux_policy install
 
 %postun
