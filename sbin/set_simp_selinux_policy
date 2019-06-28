@@ -1,0 +1,80 @@
+#!/bin/sh
+
+export PATH="/sbin:/usr/sbin:/bin:/usr/bin"
+
+declare -a simp_dirs=('/var/simp')
+declare -a old_policies=('simp-environment')
+
+cmd=$1
+
+semodule_path=`which semodule 2>/dev/null`
+
+if [ $? -eq 0 ]; then
+  if [ "${cmd}" == 'build' ]; then
+    # Build the policy from the source files
+    selinux_makefile='/usr/share/selinux/devel/Makefile'
+
+    if [ -f "${selinux_makefile}" ]; then
+      if [ -d 'build/selinux' ]; then
+        (
+          cd 'build/selinux'
+          make -f $selinux_makefile
+        )
+      else
+        echo "ERROR: could not find the SELinux components at ${build_dir}"
+        exit 2
+      fi
+    else
+      echo "ERROR: could not find ${selinux_makefile}"
+      echo "  * You probably need to install selinux-policy-devel"
+      exit 2
+    fi
+  elif [ "${cmd}" == 'install' ]; then
+    # Load policy to set selinux context to enable puppet to read from
+    # SIMP-related directories.
+
+    # Be sure to remove any conflicting old policies
+    for policy in "${old_policies[@]}"; do
+      $semodule_path --list | grep -q "${policy}"
+
+      if [ $? -eq 0 ]; then
+        $semodule_path -r "${policy}"
+      fi
+    done
+
+    if [ -f 'build/selinux/simp.pp' ]; then
+      install -p -m 644 -D 'build/selinux/simp.pp' '/usr/share/selinux/packages'
+    fi
+
+    $semodule_path -n -i /usr/share/selinux/packages/simp.pp
+
+    if [ $? -ne 0 ]; then
+      echo "ERROR: Failed to install 'simp' selinux policy"
+      exit 2
+    fi
+
+    if selinuxenabled; then
+
+      load_policy
+
+      for dir in "${simp_dirs[@]}"; do
+        restorecon -F -R -i "${dir}"
+      done
+    fi
+  elif [ "${cmd}" == 'remove' ]; then
+    # Unload the simp policy and relabel the filesystem
+
+    $semodule_path -n -r simp
+
+    if selinuxenabled; then
+      load_policy
+
+      for dir in "${simp_dirs[@]}"; do
+        restorecon -R -i "${dir}"
+      done
+    fi
+  else
+    echo "Usage: ${0} [install|remove|build]"
+    exit 1
+  fi
+fi
