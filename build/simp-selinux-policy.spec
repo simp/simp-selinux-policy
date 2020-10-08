@@ -23,6 +23,11 @@
       %global policycoreutils_version 2.2.5
       %global selinux_policy_version 3.12.1
     %endif
+
+    %if 0%{?rhel} == 8
+      %global policycoreutils_version 2.8.16
+      %global selinux_policy_version 3.14.1
+    %endif
   %endif
 %endif
 
@@ -34,8 +39,8 @@
 
 Summary: SIMP SELinux Policies
 Name: simp-selinux-policy
-Version: 1.0.0
-Release: 0%{?dist}
+Version: 1.1.0
+Release: 1%{?dist}
 License: Apache License 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
@@ -55,18 +60,22 @@ Requires(post,postun): policycoreutils
 BuildRequires: selinux-policy-targeted
 %if 0%{?selinux_policy_version:1}
 BuildRequires: policycoreutils == %{policycoreutils_version}
-BuildRequires: policycoreutils-python == %{policycoreutils_version}
 BuildRequires: selinux-policy == %{selinux_policy_version}
 BuildRequires: selinux-policy-devel == %{selinux_policy_version}
   %if 0%{?rhel} == 7
+BuildRequires: policycoreutils-python == %{policycoreutils_version}
+  %endif
+  %if 0%{?rhel} > 6
 BuildRequires: policycoreutils-devel == %{policycoreutils_version}
   %endif
 %else
 BuildRequires: policycoreutils
-BuildRequires: policycoreutils-python
 BuildRequires: selinux-policy
 BuildRequires: selinux-policy-devel
   %if 0%{?rhel} == 7
+BuildRequires: policycoreutils-python
+  %endif
+  %if 0%{?rhel} > 6
 BuildRequires: policycoreutils-devel
 BuildRequires: selinux-policy-targeted
   %endif
@@ -114,6 +123,10 @@ if [ $1 -eq 0 ]; then
 fi
 
 %changelog
+* Thu Oct 08 2020 Trevor Vaughan <tvaughan@onyxpoint.com> - 1.1.0-1
+- Added EL8 support
+- Changed the base release to 1 to align with the Fedora packaging guidelines
+
 * Tue Apr 30 2019 Trevor Vaughan <tvaughan@onyxpoint.com> - 1.0.0-0
 - Creation of a new simp-selinux-policy package.  Policies were
   originally packaged in the simp-environment package.
