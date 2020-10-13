@@ -25,7 +25,7 @@
     %endif
 
     %if 0%{?rhel} == 8
-      %global policycoreutils_version 2.8.16
+      %global policycoreutils_version 2.8-16.1
       %global selinux_policy_version 3.14.1
     %endif
   %endif
