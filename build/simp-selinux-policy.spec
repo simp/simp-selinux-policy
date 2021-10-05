@@ -39,14 +39,19 @@
 
 Summary: SIMP SELinux Policies
 Name: simp-selinux-policy
-Version: 1.1.0
+Version: 1.1.1
 Release: 1%{?dist}
 License: Apache License 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+%if 0%{?rhel} > 7
+Recommends: libselinux-utils
+Recommends: policycoreutils
+%else
 Requires: libselinux-utils
 Requires: policycoreutils
+%endif
 Requires(post): glibc-common
 Requires(post): libsemanage
 %if 0%{?selinux_policy_version:1}
@@ -123,6 +128,9 @@ if [ $1 -eq 0 ]; then
 fi
 
 %changelog
+* Tue Oct 05 2021 Trevor Vaughan <tvaughan@onyxpoint.com> - 1.1.1-1
+- Ensure that dependencies are not removed on package uninstall
+
 * Thu Oct 08 2020 Trevor Vaughan <tvaughan@onyxpoint.com> - 1.1.0-1
 - Added EL8 support
 - Changed the base release to 1 to align with the Fedora packaging guidelines
