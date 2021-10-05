@@ -46,9 +46,11 @@ Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %if 0%{?rhel} > 7
-%else
 Recommends: libselinux-utils
 Recommends: policycoreutils
+%else
+Requires: libselinux-utils
+Requires: policycoreutils
 %endif
 Requires(post): glibc-common
 Requires(post): libsemanage
