@@ -34,7 +34,7 @@ on:
 jobs:
   glci-syntax:
     name: '.gitlab-ci.yml Syntax'
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-24.04
     outputs:
       exists: ${{ steps.glci-file-exists.outputs.exists }}
       valid: ${{ steps.validate-glci-file.outputs.valid }}
@@ -126,7 +126,7 @@ jobs:
   trigger-when-user-has-repo-permissions:
     name: 'Trigger CI'
     needs: [ glci-syntax ]
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
         with:
