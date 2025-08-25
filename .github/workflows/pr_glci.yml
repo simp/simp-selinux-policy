@@ -60,7 +60,7 @@ jobs:
       exists: ${{ steps.glci-file-exists.outputs.exists }}
       valid: ${{ steps.validate-glci-file.outputs.valid }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
@@ -165,7 +165,7 @@ jobs:
       # - [x] Cancel any GLCI pipelines already pending/running for this branch
       #       - "created|waiting_for_resource|preparing|pending|running"
       # - [x] if PR: force-push branch to GitLab
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
         if: needs.contributor-permissions.outputs.permitted == 'true'
         with:
           fetch-depth: 0  # Need full checkout to push to gitlab mirror
