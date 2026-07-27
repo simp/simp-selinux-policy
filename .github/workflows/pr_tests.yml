@@ -1,0 +1,26 @@
+# Run release engineering checks on Pull Requests
+#
+# This restores the coverage of the retired GitLab CI 'validation' stage.
+#
+---
+name: PR Tests
+'on':
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  releng-checks:
+    name: 'RELENG checks'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: 'Install Ruby 3.4'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.9
+          bundler-cache: true
+      - run: 'command -v rpm || if command -v apt-get; then sudo apt-get update; sudo apt-get install -y rpm; fi ||:'
+      - name: 'Tags and changelogs'
+        run: |
+          bundle exec rake pkg:compare_latest_tag
+          bundle exec rake pkg:create_tag_changelog
