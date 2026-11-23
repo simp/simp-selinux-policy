@@ -39,7 +39,7 @@
 
 Summary: SIMP SELinux Policies
 Name: simp-selinux-policy
-Version: 1.1.1
+Version: 1.2.0
 Release: 1%{?dist}
 License: Apache License 2.0
 Group: Applications/System
@@ -60,6 +60,11 @@ Requires(post): selinux-policy-targeted >= %{selinux_policy_version}
 %else
 Requires(post): selinux-policy
 Requires(post): selinux-policy-targeted
+%endif
+%if 0%{?rhel} >= 10
+# EL10 moved the puppet and antivirus policy modules, which define types this
+# policy uses, out of selinux-policy-targeted
+Requires(post): selinux-policy-targeted-extra
 %endif
 Requires(post,postun): policycoreutils
 BuildRequires: selinux-policy-targeted
@@ -128,6 +133,10 @@ if [ $1 -eq 0 ]; then
 fi
 
 %changelog
+* Mon Nov 23 2026 Hazel Caballero <hazel@sicura.us> - 1.2.0-1
+- Added EL10 support: require selinux-policy-targeted-extra, which provides
+  the puppet and antivirus types that the policy uses
+
 * Tue Oct 05 2021 Trevor Vaughan <tvaughan@onyxpoint.com> - 1.1.1-1
 - Ensure that dependencies are not removed on package uninstall
 
